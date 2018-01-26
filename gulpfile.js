@@ -4,10 +4,19 @@ var pump = require('pump');
 var minifyCSS = require('gulp-minify-css');
 var imageMin = require('gulp-imagemin');
 var htmlmin = require('gulp-htmlmin');
+var rename=require('gulp-rename');   //文件重命名
+var gulpSequence = require('gulp-sequence');// 处理文件的顺序问题
+var del =require('del');//删除用
+
+gulp.task('clean',function() {
+    return del(['./jxcs/*'])// 清空这两个目录下的文件
+});
 gulp.task('minijs', function (cb) {
     pump([
             gulp.src('lib/**/*.js'),
             uglify(),
+            rename({
+                extname:'.min.js'}),
             gulp.dest('./')
         ],
         cb
@@ -39,6 +48,4 @@ gulp.task('minihtml', function () {
 gulp.task('json', function () {
     gulp.src('lib/**/*.json').pipe(gulp.dest('./'))
 });
-gulp.task('default', function () {
-    gulp.start('minicss', 'minijs', 'miniimage', 'minihtml','json');
-});
+gulp.task('default',gulpSequence('clean',['minicss', 'minijs', 'miniimage', 'minihtml','json']));// 数组内的并行运行 参数按前后顺序执行
